@@ -11,7 +11,10 @@ import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.dream.bean.Apply;
 import com.dream.bean.MyTask;
 import com.dream.bean.User;
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
@@ -78,14 +81,37 @@ public class Test2 {
     @Test
     public void test(){
         TaskQuery taskQuery = pe.getTaskService().createTaskQuery();//创建任务查询
-        String uname = "刘德华";//获取当前用户的名字
-        taskQuery.taskAssignee(uname);//设置查询的名字
+        taskQuery.taskAssignee("沈志龙");//设置查询的名字
         taskQuery.orderByTaskCreateTime().desc();//根据创建时间降序查询
-        List<Task> list = taskQuery.list();//查询任务集合
-        List<MyTask> myApplies=new ArrayList<>();
-        for (Task task : list) {
-            Apply apply=(Apply)pe.getRuntimeService().getVariable(task.getExecutionId(),"apply");//获取流程变量需要Task中的ExecutionId
-            System.out.println(apply.getStatus());
-        }
+        Task task=taskQuery.taskId("22536").singleResult();
 
-    }}
+        System.out.println(task.getId());
+//        List<Task> list = taskQuery.list();//查询任务集合
+//        List<MyTask> myTasks=new ArrayList<>();
+//        for (Task task : list) {
+//            Apply apply=(Apply)pe.getRuntimeService().getVariable(task.getExecutionId(),"apply");//获取流程变量需要Task中的ExecutionId
+//            System.out.println(task.getId());
+//
+//        }
+
+    }
+    @Test
+    public void test1(){
+        List<HistoricTaskInstance> list= pe.getHistoryService()
+        .createHistoricTaskInstanceQuery()
+       .taskAssignee("刘德华")
+               .finished().list();
+
+        for(HistoricTaskInstance hti:list){
+            String executionId = hti.getExecutionId();
+            Apply apply=(Apply)pe.getRuntimeService().getVariable(hti.getExecutionId(),"apply");//获取流程变量需要Task中的ExecutionId
+            System.out.println(apply.getStatus());
+            System.out.println("任务ID:"+hti.getId());
+            System.out.println("流程实例ID:"+hti.getProcessInstanceId());
+            System.out.println("班里人："+hti.getAssignee());
+            System.out.println("创建时间："+hti.getCreateTime());
+            System.out.println("结束时间："+hti.getEndTime());
+            System.out.println("===========================");
+        }
+    }
+}

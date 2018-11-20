@@ -13,6 +13,7 @@ import com.dream.utils.FileUtils;
 import com.dream.utils.TimeUtils;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.repository.*;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
@@ -51,19 +52,41 @@ public class ProcessController {
     ApplyService as;
     @Autowired
     ProcessdefineService pfs;
+    //查看待办任务的详细信息
+    @RequestMapping("/pageToApplyReply/{id}")
+    public String pageToApplyReply(@PathVariable("id") String taskId,HttpSession session, HttpServletResponse response, HttpServletRequest request,Model model){
+        User user=(User)session.getAttribute("user");
+        TaskQuery taskQuery = pe.getTaskService().createTaskQuery();//创建任务查询
+        taskQuery.taskAssignee(user.getUname());//设置查询的名字
+        //根据taskId取得当前任务实例
+        Task task=taskQuery.taskId(taskId).singleResult();
+        Apply apply =(Apply) pe.getRuntimeService().getVariable(task.getExecutionId(),"apply");
+        MyTask myTask=new MyTask(task,apply,us.selectById(apply.getApplyId()));
+        model.addAttribute("myTask",myTask);
+        return "/flow_applyReply.jsp";
+    }
+
+
+
+
+
+
+
+
+    //我的申请
     @RequestMapping("/myApplies")
     public String myApplies(HttpSession session, String type, HttpServletResponse response, HttpServletRequest request,Model model){
         User user=(User)session.getAttribute("user");
-        TaskQuery taskQuery = pe.getTaskService().createTaskQuery();//创建任务查询
-        String uname = user.getUname();//获取当前用户的名字
-        taskQuery.taskAssignee(uname);//设置查询的名字
-        taskQuery.orderByTaskCreateTime().desc();//根据创建时间降序查询
-        List<Task> list = taskQuery.list();//查询任务集合
         List<MyTask> myApplies=new ArrayList<>();
-        for (Task task : list) {
-            Apply apply=(Apply)pe.getRuntimeService().getVariable(task.getExecutionId(),"apply");//获取流程变量需要Task中的ExecutionId
-            User user1 = us.selectById(apply.getExcuteId());
-            MyTask mytask=new MyTask(task,apply,user1);
+        List<HistoricTaskInstance> list= pe.getHistoryService()
+                .createHistoricTaskInstanceQuery()
+                .taskAssignee(user.getUname())
+                .finished().list();
+        for(HistoricTaskInstance hti:list){
+            String executionId = hti.getExecutionId();//该流程的任务的执行id
+            Apply apply=(Apply)pe.getRuntimeService().getVariable(executionId,"apply");//获取流程变量需要Task中的ExecutionId
+            User user1 = us.selectById(apply.getApplyId());
+            MyTask mytask=new MyTask(hti,apply,user1);
             myApplies.add(mytask);
         }
         model.addAttribute("myApplies",myApplies);
@@ -166,7 +189,6 @@ public class ProcessController {
         in.close();
         out.close();
     }
-
     //起草申请
     @RequestMapping("/goApply")
     public String goApply(Model model,HttpSession session){
@@ -182,9 +204,9 @@ public class ProcessController {
     public void apply(Model model, HttpSession session, Apply apply,HttpServletResponse response,HttpServletRequest request) throws Exception{
         User user=(User) session.getAttribute("user");
         //1.设置初始化值
-        apply.setExcuteId(user.getId());
         apply.setStatus(Apply.APPLY_STATUS_ING);
         apply.setApplydate(TimeUtils.getTime());
+        apply.setApplyId(user.getId());
         //2.存取申请对象
         boolean insert = as.insert(apply);
         //启动任务
@@ -196,16 +218,25 @@ public class ProcessController {
         Map<String,Object> variables=new HashMap<>();
         variables.put("apply",apply);//将该申请的对象传入到变量中
         variables.put("uname",user.getUname());//设置申请人的名称
-        variables.put("banzhuren",us.getMyTeachers(user.getNo()).getUname());//设置班主任的名称
-        variables.put("fudaoyuan",us.getMyDaoyuan(user.getNo()).getUname());//设置导员
+        variables.put("banzhuren",us.selectById(apply.getExcuteId()).getUname());//设置班主任的名称
+        
+        //导员名称
+        String fudaoyuan = us.getMyDaoyuan(user.getNo()).getUname();
+        System.out.println("导员的名称:"+fudaoyuan);
+        variables.put("fudaoyuan",fudaoyuan);//设置导员
         //4 获取流程实例
         ProcessInstance pi = pe.getRuntimeService().startProcessInstanceByKey(pdkey, variables);
         System.out.println("ProcessInstance 的id为："+pi.getId());
+
+        //保存任务的流程实例id
+        String id = pi.getId();
+        apply.setProcessInstanceId(id);
+        boolean b = as.updateById(apply);
+
         //5 执行流程（提交任务）
         TaskQuery query = pe.getTaskService().createTaskQuery();
         query.taskAssignee(user.getUname());//根据登录人查询 他的任务
         query.processInstanceId(pi.getId());//设置实例id
-        //15015
         Task task = query.singleResult();
         String taskId = task.getId(); //任务ID
         pe.getTaskService().complete(taskId); //提交任务

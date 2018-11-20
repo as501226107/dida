@@ -40,7 +40,7 @@
             <td>${t.user.uname}</td>
             <td>${t.apply.remark}</td>
             <td>${t.apply.applydate}</td>
-            <td><a class="layui-btn layui-btn-mini" href="flow_applyReply.html">审批处理</a>
+            <td><a class="layui-btn layui-btn-mini" href="${pageContext.request.contextPath}/process/pageToApplyReply/${t.task.id}">审批处理</a>
                 <a class="layui-btn layui-btn-mini" href="flow_ProcessRecord.html">查看流转记录</a>
             </td>
         </tr>
