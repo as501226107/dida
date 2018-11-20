@@ -14,6 +14,8 @@ import com.dream.utils.FileUtils;
 import com.dream.utils.GetIpAddress;
 import com.dream.utils.TimeUtils;
 import com.dream.utils.ip.IpAddressSearchWebServiceSoap;
+import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.task.TaskQuery;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -49,6 +51,8 @@ public class UserController {
     IpService ipService;
     @Autowired
     PermissionService ps;
+    @Autowired
+    ProcessEngine pe;
     @RequestMapping("/login")
     public void login(User user, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception{
         User login = userService.selectOne(new EntityWrapper<User>(user).eq("del",0));
@@ -89,6 +93,11 @@ public class UserController {
                 subject.login(token);
                 User login = (User)subject.getPrincipal();
                 session.setAttribute("user",login);
+                //获取待办事项
+                TaskQuery taskQuery = pe.getTaskService().createTaskQuery();//创建任务查询
+                taskQuery.taskAssignee(login.getUname());//设置查询的名字
+                Integer size=taskQuery.list().size();//
+                session.setAttribute("myTasks",size);
                 String loginTime= TimeUtils.getTime();
                 //更新上次登录时间
                 userService.updateForSet("last_login_date='"+loginTime+"'",new EntityWrapper<User>().eq("id",login.getId()));

@@ -40,7 +40,7 @@
                 <td>${my.user.uname}</td>
                 <td>${my.apply.applydate}</td>
                 <td>${my.apply.status}</td>
-                <td><a class="layui-btn layui-btn-mini" href="#">查看申请信息</a>
+                <td><a class="layui-btn layui-btn-mini" href="${pageContext.request.contextPath}/process/pageToApplyInfo/${my.htask.id}">查看申请信息</a>
                     <a class="layui-btn layui-btn-mini" href="flow_myApplyReordList.html">查看流转记录</a>
                 </td>
             </tr>

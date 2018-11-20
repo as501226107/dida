@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.dream.bean.Apply;
 import com.dream.bean.MyTask;
 import com.dream.bean.User;
+import com.dream.utils.PasswordUtils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -113,5 +114,9 @@ public class Test2 {
             System.out.println("结束时间："+hti.getEndTime());
             System.out.println("===========================");
         }
+    }
+    @Test
+    public void test3(){
+        System.out.println( PasswordUtils.getMD5("MD5","123","你好",1024));
     }
 }

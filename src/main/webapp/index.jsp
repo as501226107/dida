@@ -47,12 +47,15 @@
     </ul>
     <ul class="layui-nav layui-layout-right">
       <li class="layui-nav-item" style="margin-right: 20px">
-        <a href="javascript:showTab(1001,'processlist.html','待办事项');">待办事项<span class="layui-badge">99+</span></a>
+        <%--如果任务大于0则显示该框--%>
+        <c:if test="${sessionScope.myTasks>0}">
+          <a href="javascript:showTab(1001,'${pageContext.request.contextPath}/process/myTasks','待办事项');">待办事项<span class="layui-badge">${myTasks}</span></a>
+        </c:if>
       </li>
       <li class="layui-nav-item">
         <a href="javascript:;">
           <img style="height: 30px;width: 30px" src="${pageContext.request.contextPath}/${user.photo}" />
-          ${user.username}
+          ${user.uname}
         </a>
         <dl class="layui-nav-child">
           <dd><a href="javascript:showTab(1001,'${pageContext.request.contextPath}/userInfo.jsp','我的信息');">我的信息</a></dd>

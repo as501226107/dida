@@ -52,6 +52,13 @@ public class ProcessController {
     ApplyService as;
     @Autowired
     ProcessdefineService pfs;
+
+    @RequestMapping("/excuteTask")
+    public String excuteTask() {
+
+        return "";
+    }
+
     //查看待办任务的详细信息
     @RequestMapping("/pageToApplyReply/{id}")
     public String pageToApplyReply(@PathVariable("id") String taskId,HttpSession session, HttpServletResponse response, HttpServletRequest request,Model model){
@@ -66,11 +73,19 @@ public class ProcessController {
         return "/flow_applyReply.jsp";
     }
 
-
-
-
-
-
+    //查看任务申请信息
+    @RequestMapping("/pageToApplyInfo/{id}")
+    public String pageToApplyInfo(@PathVariable("id") String taskId,HttpSession session, HttpServletResponse response, HttpServletRequest request,Model model){
+        User user=(User)session.getAttribute("user");
+        HistoricTaskInstance task= pe.getHistoryService()
+                .createHistoricTaskInstanceQuery()
+                .taskAssignee(user.getUname())
+                .finished().singleResult();
+        Apply apply =(Apply) pe.getRuntimeService().getVariable(task.getExecutionId(),"apply");
+        MyTask myTask=new MyTask(task,apply,us.selectById(apply.getApplyId()));
+        model.addAttribute("myTask",myTask);
+        return "/flow_applyInfo.jsp";
+    }
 
 
     //我的申请

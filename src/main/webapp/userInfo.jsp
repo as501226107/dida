@@ -25,7 +25,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">姓名</label>
             <div class="layui-input-block">
-                <div class="layui-form-mid layui-word-aux">${user.username}</div>
+                <div class="layui-form-mid layui-word-aux">${user.uname}</div>
             </div>
         </div>
         <div class="layui-form-item">
