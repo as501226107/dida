@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dream.mapper.ApplyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dream.bean.Apply">
+        <id column="id" property="id" />
+        <result column="startdate" property="startdate" />
+        <result column="enddate" property="enddate" />
+        <result column="days" property="days" />
+        <result column="type" property="type" />
+        <result column="excute_id" property="excuteId" />
+        <result column="apply_id" property="applyId" />
+        <result column="status" property="status" />
+        <result column="remark" property="remark" />
+        <result column="applydate" property="applydate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, startdate, enddate, days, type, excute_id, apply_id, status, remark, applydate
+    </sql>
+
+</mapper>

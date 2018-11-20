@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:cxf="http://cxf.apache.org/core"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+	   http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+	   http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+
+">
+   <!--加载配置文件-->
+    <!--使用spring自带的占位符替换功能 -->
+    <bean
+            class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <!-- 忽略没有找到的资源文件 -->
+        <property name="ignoreResourceNotFound" value="false" />
+        <!-- 配置资源文件 -->
+        <property name="locations">
+            <list>
+                <value>classpath:jdbc.properties</value>
+            </list>
+        </property>
+    </bean>
+    <!--扫描包-->
+    <context:component-scan base-package="com.dream"/>
+    <!--配置数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${driver}"></property>
+        <property name="jdbcUrl" value="${url}"></property>
+        <property name="user" value="${user}"></property>
+        <property name="password" value="${password}"></property>
+    </bean>
+    <!-- 配置sqlsession工厂 -->
+    <bean id="sqlSessionFactory" class="com.baomidou.mybatisplus.spring.MybatisSqlSessionFactoryBean">
+        <!--配置扫描mybatis配置文件，用于加入插件-->
+        <property name="configLocation" value="classpath:mybatis-config.xml" />
+        <property name="dataSource" ref="dataSource"></property>
+        <!--配置别名自动扫描bean-->
+        <property name="typeAliasesPackage" value="com.dream.bean"></property>
+        <!--配置扫描地mappper.xml文件-->
+        <property name="mapperLocations" value="classpath*:com/dream/mapper/*.xml"></property>
+    </bean>
+    <!-- DAO接口所在包名，Spring会自动查找其下的类 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.dream.mapper" />
+    </bean>
+    <!--配置事务管理器-->
+    <bean id="dataSourceTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!--开启事务驱动支持-->
+    <tx:annotation-driven transaction-manager="dataSourceTransactionManager"/>
+
+
+    <!-- 配置一个spring提供的对象，用于创建一个流程引擎配置对象 -->
+    <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+        <property name="transactionManager" ref="dataSourceTransactionManager" />
+        <property name="dataSource" ref="dataSource" />
+        <property name="databaseSchemaUpdate" value="true" />
+    </bean>
+    <!-- 创建流程引擎对象 -->
+    <bean id="pe" class="org.activiti.spring.ProcessEngineFactoryBean">
+        <property name="processEngineConfiguration" ref="processEngineConfiguration" />
+    </bean>
+
+
+    <!--配置webservice-->
+    <!-- 发布服务 -->
+    <jaxws:server address="/mobile">
+        <jaxws:serviceBean>
+            <ref bean="phoneServiceImpl" />
+        </jaxws:serviceBean>
+    </jaxws:server>
+    <!-- 发布服务 -->
+    <jaxws:server address="/ip">
+        <jaxws:serviceBean>
+            <ref bean="ipServiceImpl" />
+        </jaxws:serviceBean>
+    </jaxws:server>
+    <!-- 配置服务类 -->
+    <bean name="phoneServiceImpl" class="com.dream.service.impl.PhoneServiceImpl">
+        <property name="mobile" ref="mobile"></property>
+    </bean>
+    <!-- 配置服务类 -->
+    <bean name="ipServiceImpl" class="com.dream.service.impl.IpServiceImpl">
+        <property name="ipAddress" ref="ipAddress"></property>
+    </bean>
+    <!-- 配置手机查询公网客户端 -->
+    <jaxws:client id="mobile"
+                  address="http://ws.webxml.com.cn/WebServices/MobileCodeWS.asmx"
+                  serviceClass="com.dream.utils.mobile.MobileCodeWSSoap">
+    </jaxws:client>
+    <!-- 配置ip查询客户端 -->
+    <jaxws:client id="ipAddress"
+                  address="http://ws.webxml.com.cn/WebServices/IpAddressSearchWebService.asmx"
+                  serviceClass="com.dream.utils.ip.IpAddressSearchWebServiceSoap">
+    </jaxws:client>
+    <!--
+1. 配置 SecurityManager!
+-->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="cacheManager" ref="cacheManager"/>
+        <property name="authenticator" ref="authenticator"></property>
+
+        <property name="realms">
+            <list>
+                <ref bean="loginRealms"/>
+            </list>
+        </property>
+
+        <property name="rememberMeManager.cookie.maxAge" value="10"></property>
+    </bean>
+
+    <!-- Let's use some enterprise caching support for better performance.  You can replace this with any enterprise
+         caching framework implementation that you like (Terracotta+Ehcache, Coherence, GigaSpaces, etc -->
+    <!--
+    2. 配置 CacheManager.
+    2.1 需要加入 ehcache 的 jar 包及配置文件.
+    -->
+    <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <!-- Set a net.sf.ehcache.CacheManager instance here if you already have one.  If not, a new one
+             will be creaed with a default config:
+             <property name="cacheManager" ref="ehCacheManager"/> -->
+        <!-- If you don't have a pre-built net.sf.ehcache.CacheManager instance to inject, but you want
+             a specific Ehcache configuration to be used, specify that here.  If you don't, a default
+             will be used.: -->
+        <property name="cacheManagerConfigFile" value="classpath:ehcache.xml"/>
+    </bean>
+
+    <bean id="authenticator"
+          class="org.apache.shiro.authc.pam.ModularRealmAuthenticator">
+        <property name="authenticationStrategy">
+            <bean class="org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy"></bean>
+        </property>
+    </bean>
+
+    <!-- Used by the SecurityManager to access security data (users, roles, etc).
+         Many other realm implementations can be used too (PropertiesRealm,
+         LdapRealm, etc. -->
+    <!--
+    	3. 配置 Realm
+    	3.1 直接配置实现了 org.apache.shiro.realm.Realm 接口的 bean
+    -->
+    <bean id="loginRealms" class="com.dream.realms.LoginRealm">
+        <property name="credentialsMatcher">
+            <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+                <property name="hashAlgorithmName" value="MD5"></property>
+                <property name="hashIterations" value="1024"></property>
+            </bean>
+        </property>
+    </bean>
+
+
+
+    <!-- =========================================================
+         Shiro Spring-specific integration
+         ========================================================= -->
+    <!-- Post processor that automatically invokes init() and destroy() methods
+         for Spring-configured Shiro objects so you don't have to
+         1) specify an init-method and destroy-method attributes for every bean
+            definition and
+         2) even know which Shiro objects require these methods to be
+            called. -->
+    <!--
+    4. 配置 LifecycleBeanPostProcessor. 可以自定的来调用配置在 Spring IOC 容器中 shiro bean 的生命周期方法.
+    -->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+
+    <!-- Enable Shiro Annotations for Spring-configured beans.  Only run after
+         the lifecycleBeanProcessor has run: -->
+    <!--
+    5. 启用 IOC 容器中使用 shiro 的注解. 但必须在配置了 LifecycleBeanPostProcessor 之后才可以使用.
+    -->
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+          depends-on="lifecycleBeanPostProcessor"/>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+
+    <!-- Define the Shiro Filter here (as a FactoryBean) instead of directly in web.xml -
+         web.xml uses the DelegatingFilterProxy to access this bean.  This allows us
+         to wire things with more control as well utilize nice Spring things such as
+         PropertiesPlaceholderConfigurer and abstract beans or anything else we might need: -->
+    <!--
+    6. 配置 ShiroFilter.
+    6.1 id 必须和 web.xml 文件中配置的 DelegatingFilterProxy 的 <filter-name> 一致.
+                      若不一致, 则会抛出: NoSuchBeanDefinitionException. 因为 Shiro 会来 IOC 容器中查找和 <filter-name> 名字对应的 filter bean.
+    -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <property name="loginUrl" value="/login.jsp"/>
+        <property name="successUrl" value="/index.jsp"/>
+        <property name="unauthorizedUrl" value="/login.jsp"/>
+
+        <!--<property name="filterChainDefinitionMap" ref="filterChainDefinitionMap"></property>-->
+
+        <!--
+        	配置哪些页面需要受保护.
+        	以及访问这些页面需要的权限.
+        	1). anon 可以被匿名访问
+        	2). authc 必须认证(即登录)后才可能访问的页面.
+        	3). logout 登出.
+        	4). roles 角色过滤器
+        -->
+
+        <property name="filterChainDefinitions">
+            <value>
+                /login.jsp = anon
+                /user/shirologin = anon
+                /media/**=anon
+                /user/loginOut = logout
+                # everything else requires authentication:
+                /** = authc
+            </value>
+        </property>
+
+    </bean>
+</beans>

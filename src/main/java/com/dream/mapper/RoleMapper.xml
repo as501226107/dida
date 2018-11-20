@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dream.mapper.RoleMapper">
+
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dream.bean.Role">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="available" property="available" />
+    </resultMap>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="myMap" type="com.dream.bean.Role">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="available" property="available" />
+        <collection property="permissions" ofType="com.dream.bean.Permission">
+            <id property="id" column="sys_permission_id"></id>
+            <result column="name" property="name" />
+            <result column="icon" property="icon" />
+            <result column="type" property="type" />
+            <result column="url" property="url" />
+            <result column="percode" property="percode" />
+            <result column="parentid" property="parentid" />
+            <result column="parentids" property="parentids" />
+            <result column="sortstring" property="sortstring" />
+            <result column="p_av" property="available" />
+        </collection>
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, available
+    </sql>
+    <select id="getRoleById" resultType="Role">
+        select
+        <include refid="Base_Column_List"></include>
+        from sys_role
+        where id=#{id}
+    </select>
+    <select id="getRoleWithPermission" resultMap="myMap">
+        select *,p.available p_av from sys_role r,sys_role_permission rp,sys_permission p
+        where r.id=rp.sys_role_id and p.id=rp.sys_permission_id
+        and r.id=#{id}
+    </select>
+</mapper>

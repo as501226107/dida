@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dream.mapper.UserMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dream.bean.User">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="salt" property="salt" />
+        <result column="last_login_date" property="lastLoginDate" />
+        <result column="locked" property="locked" />
+        <result column="del" property="del" />
+        <result column="photo" property="photo" />
+        <result column="no" property="no" />
+        <result column="uname" property="uname" />
+        <collection property="roles" ofType="com.dream.bean.Role">
+            <id column="sys_role_id" property="id"></id>
+            <result column="rname" property="name"></result>
+            <result column="available" property="available"></result>
+        </collection>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, username, password, salt, last_login_date, locked, del, photo
+    </sql>
+    <select id="login" resultMap="BaseResultMap" parameterType="User">
+        select *,r.id as rid from sys_user s,sys_role r,sys_user_role ur
+        WHERE s.id=ur.sys_user_id and r.id=ur.sys_role_id
+        and s.del=0
+        and username=#{username}
+    </select>
+    <select id="selectUserWithRole" resultMap="BaseResultMap" parameterType="com.dream.bean.User">
+        select *,r.id as rid,r.name as rname  from sys_user s,sys_role r,sys_user_role ur
+        WHERE s.id=ur.sys_user_id and r.id=ur.sys_role_id
+        and s.del=0
+        and username=#{username}
+    </select>
+    <select id="getMyTeachers" resultType="com.dream.bean.User">
+	       select sys_user.* from t_student,t_grade,sys_user where t_student.gid=t_grade.id
+        and t_grade.teacherId=sys_user.id and t_student.no=#{no} and sys_user.del=0 and sys_user.locked=0
+	</select>
+    <select id="getMyDaoyuan" resultType="com.dream.bean.User">
+	       select sys_user.* from t_student,t_grade,sys_user where t_student.gid=t_grade.id
+        and t_grade.daoyuanId=sys_user.id and t_student.no=#{no} and sys_user.del=0 and sys_user.locked=0
+	</select>
+</mapper>
