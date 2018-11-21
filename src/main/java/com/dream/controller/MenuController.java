@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/menu")
@@ -43,6 +45,25 @@ public class MenuController {
             return ms.selectList(new EntityWrapper<Permission>().eq("del",0).eq("type","menu")
             .eq("parentid",0)
             );
+    }
+    //获取二级菜单，所有父菜单，以及其父菜单
+    @RequestMapping("/getSecondMenus/{id}")
+    @ResponseBody
+    public Map<String,Object> getSecondMenus(@PathVariable("id")Integer id) throws Exception{
+        //获取所有菜单
+        List<Permission> firstMenus =
+                ms.selectList(new EntityWrapper<Permission>().eq("del", 0).eq("type", "menu").eq("parentid", 0));//获取一级菜单
+        //获取该菜单的父菜单
+        Permission sesondMenu = ms.selectById(id);
+        for (Permission firstMenu : firstMenus) {
+            if(sesondMenu.getParentid()==firstMenu.getId()){
+                firstMenu.setFlag(true);//设置选中状态
+            }
+        }
+        Map<String,Object> map=new HashMap<>();
+        map.put("menus",firstMenus);
+        map.put("parent",sesondMenu);
+        return map;
     }
     @ResponseBody
     @RequestMapping("/addMenu")

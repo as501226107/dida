@@ -290,33 +290,36 @@
     function updateMenu2(id) {
         //为隐藏id赋值
         $("#update2_id").val(id);
-        //初始化参数
-        $.get("${pageContext.request.contextPath}/menu/getParentMenus", null, function(arr) {
-            for(i = 0; i < arr.length; i++) {
-                $("#pid_level2").append("<option value=\"" + arr[i].id + "\">" + arr[i].name + "</option>");
-            }
-            $("#dvl1").css("display", "block");
-            //回显表单参数
+        layui.use('table', function() {
+            //初始化参数
             $.ajax({
-                url:'${pageContext.request.contextPath}/menu/getMenu/'+id,
-                type:'get',
-                success:function(data){
+                url:"${pageContext.request.contextPath}/menu/getSecondMenus/"+id,
+                type:"post",
+                success:function(result) {
+                    $("#pid_level2").empty();
+                    var arr = result.menus;
+                    var data = result.parent;
+                    for (i = 0; i < arr.length; i++) {
+                        if (arr[i].flag == true) {
+                            $("#pid_level2").append("<option value='" + arr[i].id + "' checked>" + arr[i].name + "</option>");
+                            $("#pid_level2").val(arr[i].id);
+                        } else {
+                            $("#pid_level2").append("<option value='" + arr[i].id + "'>" + arr[i].name + "</option>");
+                        }
+                    }
                     $("#name_level2").val(data.name);
                     $("#icon_level2").val(data.icon);
                     $("#url_level2").val(data.url);
                     $("#update_pid").val(data.parentid);
-                    //选中下拉框
-                    $("#pid_level2").val(data.parentid);
+                    $("#dvl1").css("display", "block");
                 }
             });
-        });
-
-        layui.use('table', function() {
             form=layui.form;
             form.on('select(level)', function (data) {
                 //初始化
                 update_level2_setpid(data.value);//绑定事件
             });
+            form.render();
             layer.open({
                 area: ['500px', '380px'],
                 title: '二级菜单更新',
