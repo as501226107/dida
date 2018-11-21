@@ -123,7 +123,7 @@ public class ProcessController {
         User user=(User)session.getAttribute("user");
         //1.接受用户发送的参数
         Approve approve=new Approve();
-        approve.setId(applyId);
+        approve.setApplyId(applyId);
         approve.setUserId(user.getId());//处理人的id
         approve.setApproveDate(TimeUtils.getTime());
         approve.setComment(comment);
@@ -166,7 +166,7 @@ public class ProcessController {
     @RequestMapping("/myApplies")
     public String myApplies(HttpSession session, String type, HttpServletResponse response, HttpServletRequest request,Model model){
         User user=(User)session.getAttribute("user");
-        List<Apply> apply_id = as.selectList(new EntityWrapper<Apply>().eq("apply_id", user.getId()));
+        List<Apply> apply_id = as.selectList(new EntityWrapper<Apply>().eq("apply_id", user.getId()).orderBy("applydate",false));
         model.addAttribute("myApplies",apply_id);
         return "/flow_myApplyList.jsp";
     }
@@ -183,7 +183,7 @@ public class ProcessController {
         List<MyTask> myTasks=new ArrayList<>();
         for (Task task : list) {
             Apply apply=(Apply)pe.getRuntimeService().getVariable(task.getExecutionId(),"apply");//获取流程变量需要Task中的ExecutionId
-            User user1 = us.selectById(apply.getExcuteId());
+            User user1 = us.selectById(apply.getApplyId());//获取申请人的用户id
             MyTask mytask=new MyTask(task,apply,user1);
             myTasks.add(mytask);
         }

@@ -86,19 +86,16 @@ public class ProcessServiceImpl implements ProcessService {
     @Transactional(propagation = Propagation.REQUIRED)
     public int aprrove(Approve approve, String taskId) {
         try {
+
+            //1.将审批对象存入数据库
+            boolean insert = approveService.insert(approve);
+            //2.开始提交任务
             //得到apply表的id
-            Integer id = approve.getId();
-            Apply apply = as.selectById(id);
-            Integer applyId1 = apply.getApplyId();//获得申请人用户的id
-            approve.setUserId(applyId1);
-            approve.setApplyId(id);
+            Apply apply = as.selectById(approve.getApplyId());
             //0.根据当前任务id查到任务
             Task task = pe.getTaskService().createTaskQuery().taskId(taskId).singleResult();
             // 0.获得当前流程实例id
             String processInstanceId = task.getProcessInstanceId();
-            //1.将审批对象存入数据库
-            boolean insert = approveService.insert(approve);
-            //2.开始提交任务
             TaskService taskService = pe.getTaskService();
             //3.办理当前的任务
             pe.getTaskService().complete(taskId); // 办理当前任务
