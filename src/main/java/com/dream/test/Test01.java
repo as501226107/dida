@@ -124,7 +124,7 @@ public class Test01 {
                 .setDbColumnUnderline(true)
                 .setNaming(NamingStrategy.underline_to_camel)
                 .setTablePrefix("t_")
-                .setInclude("t_apply");
+                .setInclude("t_approve");
         //4. 包名策略配置
         PackageConfig pkConfig = new PackageConfig();
         pkConfig.setParent("com.dream")

@@ -8,7 +8,7 @@ import java.util.Date;
 /**
   *  Class Name: TimeUtils.java
   *  Description: 
-  *  @author  dragon  DateTime 2018年10月9日 下午2:40:41 
+  *  @author
   *  @company bvit 
   *  @email  a501226107@qq.com 
   *  @version 1.0

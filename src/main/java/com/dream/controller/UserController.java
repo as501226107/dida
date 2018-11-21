@@ -10,10 +10,7 @@ import com.dream.service.LoginlogService;
 import com.dream.service.PermissionService;
 import com.dream.service.UserService;
 import com.dream.utils.CreateFileUtils;
-import com.dream.utils.FileUtils;
-import com.dream.utils.GetIpAddress;
 import com.dream.utils.TimeUtils;
-import com.dream.utils.ip.IpAddressSearchWebServiceSoap;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.task.TaskQuery;
 import org.apache.shiro.SecurityUtils;
@@ -28,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;

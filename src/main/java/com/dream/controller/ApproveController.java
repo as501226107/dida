@@ -11,11 +11,11 @@ import org.springframework.stereotype.Controller;
  * </p>
  *
  * @author dragon
- * @since 2018-11-19
+ * @since 2018-11-21
  */
 @Controller
-@RequestMapping("/apply")
-public class ApplyController {
+@RequestMapping("/approve")
+public class ApproveController {
 
 }
 

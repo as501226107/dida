@@ -1,13 +1,8 @@
 package com.dream.controller;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.dream.bean.Apply;
-import com.dream.bean.MyTask;
-import com.dream.bean.Processdefine;
-import com.dream.bean.User;
-import com.dream.service.ApplyService;
-import com.dream.service.ProcessdefineService;
-import com.dream.service.UserService;
+import com.dream.bean.*;
+import com.dream.service.*;
 import com.dream.utils.CreateFileUtils;
 import com.dream.utils.FileUtils;
 import com.dream.utils.TimeUtils;
@@ -52,63 +47,132 @@ public class ProcessController {
     ApplyService as;
     @Autowired
     ProcessdefineService pfs;
+    @Autowired
+    ProcessService ps;
+    @Autowired
+    ApproveService approveService;
+    /*
+     * 11-查询png流 显示图
+     */
+    @RequestMapping("/viewImage")
+    public void viewImage(String deploymentId, String imageName, HttpServletResponse response) throws Exception {
+        InputStream in = pe.getRepositoryService().getResourceAsStream(deploymentId, imageName);
 
-    @RequestMapping("/excuteTask")
-    public String excuteTask() {
+        ServletOutputStream out = response.getOutputStream();
+        response.setContentType("image/png");
+        byte buffer[] = new byte[1024];
+        int len = 0;
+        while ((len = in.read(buffer)) > 0) {
+            out.write(buffer, 0, len);
+        }
+        out.close();
+        in.close();
+    }
+    /*
+     * 10-查看流程记录图片图示
+     */
+    @RequestMapping("/showPng")
+    public String showPng(Integer applyId, Model model) {
 
-        return "";
+        // applyId  申请对象 Aplly的ID
+
+        // 根据流程变量查询当前任务
+        TaskQuery query = pe.getTaskService().createTaskQuery();
+        // 根据设置的流程变量进行过滤
+        query.processVariableValueEquals("applyId", applyId); //根据流程变量中applyId 查询一个任务
+
+        Task task = query.singleResult();
+
+        // 根据任务查询流程定义对象
+        String processDefinitionId = task.getProcessDefinitionId();
+        ProcessDefinitionQuery query1 = pe.getRepositoryService().createProcessDefinitionQuery();
+        query1.processDefinitionId(processDefinitionId);
+
+        ProcessDefinition pd = query1.singleResult();
+
+        model.addAttribute("deploymentId", pd.getDeploymentId()); //获取部署流程ID
+        model.addAttribute("imageName", pd.getDiagramResourceName());  //获取部署图片资源名字
+
+        // 根据任务查询坐标
+        Map<String, Object> map = ps.findCoordingByTask(task);
+
+        model.addAttribute("acs", map);
+
+        return "/flow_image.jsp";
     }
 
-    //查看待办任务的详细信息
-    @RequestMapping("/pageToApplyReply/{id}")
-    public String pageToApplyReply(@PathVariable("id") String taskId,HttpSession session, HttpServletResponse response, HttpServletRequest request,Model model){
+
+
+    //查看流程流转记录
+    @RequestMapping("/flowRecord/{applyId}")
+    public String flowRecord(@PathVariable("applyId") Integer id,Model model){
+        List<Approve> approves = approveService.selectList(new EntityWrapper<Approve>().eq("apply_id", id));
+        for (Approve approve : approves) {
+            Integer userId = approve.getUserId();
+            User user = us.selectById(userId);
+            approve.setUser(user);
+        }
+        model.addAttribute("approves",approves);
+        return "/flow_myApplyReordList.jsp";
+    }
+
+
+    //审批流程
+    @RequestMapping("/approve")
+    public void approve(HttpSession session,Integer applyId,String taskId,String comment,Boolean approval,HttpServletResponse response, HttpServletRequest request) throws  Exception{
         User user=(User)session.getAttribute("user");
+        //1.接受用户发送的参数
+        Approve approve=new Approve();
+        approve.setId(applyId);
+        approve.setUserId(user.getId());//处理人的id
+        approve.setApproveDate(TimeUtils.getTime());
+        approve.setComment(comment);
+        approve.setApproveValue(approval);
+        int aprrove = ps.aprrove(approve, taskId);
+        //更新用户当前的任务数
         TaskQuery taskQuery = pe.getTaskService().createTaskQuery();//创建任务查询
         taskQuery.taskAssignee(user.getUname());//设置查询的名字
-        //根据taskId取得当前任务实例
-        Task task=taskQuery.taskId(taskId).singleResult();
-        Apply apply =(Apply) pe.getRuntimeService().getVariable(task.getExecutionId(),"apply");
-        MyTask myTask=new MyTask(task,apply,us.selectById(apply.getApplyId()));
-        model.addAttribute("myTask",myTask);
+        Integer size=taskQuery.list().size();//
+        session.setAttribute("myTasks",size);
+        if(aprrove==1){
+            response.getWriter().write("<script>alert('审批成功！！');location.href='"+request.getContextPath()+"/process/myTasks'</script>");
+        }else{
+            response.getWriter().write("<script>alert('审批失败！！');location.href='"+request.getContextPath()+"/process/myTasks'</script>");
+
+        }
+    }
+
+
+    //审批任务，查看详细信息
+    @RequestMapping("/pageToApplyReply")
+    public String pageToApplyReply(String taskId,String apply_id,HttpSession session, HttpServletResponse response, HttpServletRequest request,Model model){
+        User user=(User)session.getAttribute("user");
+        Apply apply = as.selectById(apply_id);
+        model.addAttribute("apply",apply);
+        model.addAttribute("taskId",taskId);
         return "/flow_applyReply.jsp";
     }
 
+
     //查看任务申请信息
     @RequestMapping("/pageToApplyInfo/{id}")
-    public String pageToApplyInfo(@PathVariable("id") String taskId,HttpSession session, HttpServletResponse response, HttpServletRequest request,Model model){
-        User user=(User)session.getAttribute("user");
-        HistoricTaskInstance task= pe.getHistoryService()
-                .createHistoricTaskInstanceQuery()
-                .taskAssignee(user.getUname())
-                .finished().singleResult();
-        Apply apply =(Apply) pe.getRuntimeService().getVariable(task.getExecutionId(),"apply");
-        MyTask myTask=new MyTask(task,apply,us.selectById(apply.getApplyId()));
-        model.addAttribute("myTask",myTask);
+    public String pageToApplyInfo(@PathVariable("id") String apply_id,HttpSession session, HttpServletResponse response, HttpServletRequest request,Model model){
+        Apply apply = as.selectById(apply_id);
+        model.addAttribute("apply",apply);
         return "/flow_applyInfo.jsp";
     }
-
 
     //我的申请
     @RequestMapping("/myApplies")
     public String myApplies(HttpSession session, String type, HttpServletResponse response, HttpServletRequest request,Model model){
         User user=(User)session.getAttribute("user");
-        List<MyTask> myApplies=new ArrayList<>();
-        List<HistoricTaskInstance> list= pe.getHistoryService()
-                .createHistoricTaskInstanceQuery()
-                .taskAssignee(user.getUname())
-                .finished().list();
-        for(HistoricTaskInstance hti:list){
-            String executionId = hti.getExecutionId();//该流程的任务的执行id
-            Apply apply=(Apply)pe.getRuntimeService().getVariable(executionId,"apply");//获取流程变量需要Task中的ExecutionId
-            User user1 = us.selectById(apply.getApplyId());
-            MyTask mytask=new MyTask(hti,apply,user1);
-            myApplies.add(mytask);
-        }
-        model.addAttribute("myApplies",myApplies);
+        List<Apply> apply_id = as.selectList(new EntityWrapper<Apply>().eq("apply_id", user.getId()));
+        model.addAttribute("myApplies",apply_id);
         return "/flow_myApplyList.jsp";
     }
 
-        @RequestMapping("/myTasks")
+    //查看我的任务列表
+    @RequestMapping("/myTasks")
     public String myTask(HttpSession session, HttpServletResponse response, HttpServletRequest request,Model model){
         User user=(User)session.getAttribute("user");
         TaskQuery taskQuery = pe.getTaskService().createTaskQuery();//创建任务查询
@@ -222,43 +286,18 @@ public class ProcessController {
         apply.setStatus(Apply.APPLY_STATUS_ING);
         apply.setApplydate(TimeUtils.getTime());
         apply.setApplyId(user.getId());
-        //2.存取申请对象
-        boolean insert = as.insert(apply);
-        //启动任务
-        //根据类型获取任务key
-        Processdefine applytype = pfs.selectOne(new EntityWrapper<Processdefine>().eq("type","请假流程"));
-        String pdkey = applytype.getKey();
-        //获取该学生所对应班级的班主任和辅导员的id
-        //3.设置环境变量
-        Map<String,Object> variables=new HashMap<>();
-        variables.put("apply",apply);//将该申请的对象传入到变量中
-        variables.put("uname",user.getUname());//设置申请人的名称
-        variables.put("banzhuren",us.selectById(apply.getExcuteId()).getUname());//设置班主任的名称
-        
-        //导员名称
-        String fudaoyuan = us.getMyDaoyuan(user.getNo()).getUname();
-        System.out.println("导员的名称:"+fudaoyuan);
-        variables.put("fudaoyuan",fudaoyuan);//设置导员
-        //4 获取流程实例
-        ProcessInstance pi = pe.getRuntimeService().startProcessInstanceByKey(pdkey, variables);
-        System.out.println("ProcessInstance 的id为："+pi.getId());
+        //开始申请
+        int status = ps.apply(apply, user);
+        if(status==1){
+            response.getWriter()
+                    .write("<script>alert('申请提交成功，审核中....');location.href='"
+                            + request.getContextPath() + "/process/myApplies;'</script>");
+        }else {
+            response.getWriter()
+                    .write("<script>alert('提交失败，请练习管理员.');location.href='"
+                            + request.getContextPath() + "/process/myApplies;'</script>");
+        }
 
-        //保存任务的流程实例id
-        String id = pi.getId();
-        apply.setProcessInstanceId(id);
-        boolean b = as.updateById(apply);
-
-        //5 执行流程（提交任务）
-        TaskQuery query = pe.getTaskService().createTaskQuery();
-        query.taskAssignee(user.getUname());//根据登录人查询 他的任务
-        query.processInstanceId(pi.getId());//设置实例id
-        Task task = query.singleResult();
-        String taskId = task.getId(); //任务ID
-        pe.getTaskService().complete(taskId); //提交任务
-        System.out.println("任务申请成功......");
-        response.getWriter()
-                .write("<script>alert('申请提交成功，审核中....');location.href='"
-                        + request.getContextPath() + "/process/list;'</script>");
     }
 
 }

@@ -1,5 +1,6 @@
 package com.dream.bean;
 
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.enums.IdType;
 
 import java.util.Date;
@@ -43,6 +44,7 @@ public class Apply implements Serializable {
     private String status;
     private String remark;
     private String  applydate;
+    @TableField(value = "processInstanceId")
     private String processInstanceId;
 
     public String getProcessInstanceId() {

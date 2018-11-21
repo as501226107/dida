@@ -35,13 +35,21 @@
         <tbody>
         <c:forEach items="${myApplies}" var="my">
             <tr>
-                <td>${my.apply.id}</td>
-                <td>${my.apply.remark}</td>
-                <td>${my.user.uname}</td>
-                <td>${my.apply.applydate}</td>
-                <td>${my.apply.status}</td>
-                <td><a class="layui-btn layui-btn-mini" href="${pageContext.request.contextPath}/process/pageToApplyInfo/${my.htask.id}">查看申请信息</a>
-                    <a class="layui-btn layui-btn-mini" href="flow_myApplyReordList.html">查看流转记录</a>
+                <td>${my.id}</td>
+                <td>${my.remark}</td>
+                <td>${sessionScope.user.uname}</td>
+                <td>${my.applydate}</td>
+                <c:if test="${my.status=='通过审批'}">
+                    <td style="color:green">${my.status}</td>
+                </c:if>
+                <c:if test="${my.status=='审批中'}">
+                    <td style="color:blue">${my.status}</td>
+                </c:if>
+                <c:if test="${my.status=='未通过'}">
+                    <td style="color:red">${my.status}</td>
+                </c:if>
+                <td><a class="layui-btn layui-btn-mini" href="${pageContext.request.contextPath}/process/pageToApplyInfo/${my.id}">查看申请信息</a>
+                    <a class="layui-btn layui-btn-mini" href="${pageContext.request.contextPath}/process/flowRecord/${my.id}">查看流转记录</a>
                 </td>
             </tr>
         </c:forEach>

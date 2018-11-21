@@ -24,40 +24,45 @@
         <div class="layui-form-item">
             <label class="layui-form-label">申请人</label>
             <div class="layui-input-block">
-                <input type="text" disabled name="startdate" class="layui-input mydate" value="${myTask.user.uname}">
+                <input type="text" disabled name="startdate" class="layui-input mydate" value="${sessionScope.user.uname}">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">起始日期</label>
             <div class="layui-input-block">
-                <input type="text" disabled name="startdate" class="layui-input mydate" value="${myTask.apply.startdate}">
+                <input type="text" disabled name="startdate" class="layui-input mydate" value="${apply.startdate}">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">结束日期</label>
             <div class="layui-input-block">
-                <input type="text" disabled name="enddate" class="layui-input mydate" value="${myTask.apply.enddate}">
+                <input type="text" disabled name="enddate" class="layui-input mydate" value="${apply.enddate}">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">涉及天数</label>
             <div class="layui-input-inline">
-                <input  name="days" disabled class="layui-input" value="${myTask.apply.days}天"/>
+                <input  name="days" disabled class="layui-input" value="${apply.days}天"/>
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">操作类型</label>
             <div class="layui-input-block">
-                <input  name="days" disabled class="layui-input" value="${myTask.apply.type}天"/>
+                <input  name="days" disabled class="layui-input" value="${apply.type}天"/>
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">说明信息</label>
             <div class="layui-input-block">
-                <input name="remark" disabled placeholder="请输入原因" disabled value="${myTask.apply.remark}" class="layui-input"/>
+                <input name="remark" disabled placeholder="" disabled value="${apply.remark}" class="layui-input"/>
             </div>
         </div>
-
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请状态</label>
+            <div class="layui-input-block">
+                <input name="status" disabled placeholder="" disabled value="${apply.status}" class="layui-input"/>
+            </div>
+        </div>
 
 <script src="${pageContext.request.contextPath}//layui/layui.js"></script>
 <script>
