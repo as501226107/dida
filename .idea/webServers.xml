@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="7de11bdb-3741-4a0c-8b7f-2d524c053c88" name="阿里云" url="http://47.94.213.97">
+        <fileTransfer host="47.94.213.97" port="22" rootFolder="/www/server/apache-tomcat-8.5.32" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+      <webServer id="9a7aa9da-eedb-433c-9eb0-a6ecba43abc0" name="本机1" url="http://192.168.159.131:80">
+        <fileTransfer host="192.168.159.131" port="22" rootFolder="/home/mysoft/tomcat8.5/webapps" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions controlEncoding="UTF-8" dataProtectionLevel="Private" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

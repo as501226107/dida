@@ -68,37 +68,37 @@
     </bean>
 
 
-    <!--配置webservice-->
-    <!-- 发布服务 -->
+  <!--  &lt;!&ndash;配置webservice&ndash;&gt;
+    &lt;!&ndash; 发布服务 &ndash;&gt;
     <jaxws:server address="/mobile">
         <jaxws:serviceBean>
             <ref bean="phoneServiceImpl" />
         </jaxws:serviceBean>
     </jaxws:server>
-    <!-- 发布服务 -->
+    &lt;!&ndash; 发布服务 &ndash;&gt;
     <jaxws:server address="/ip">
         <jaxws:serviceBean>
             <ref bean="ipServiceImpl" />
         </jaxws:serviceBean>
     </jaxws:server>
-    <!-- 配置服务类 -->
+    &lt;!&ndash; 配置服务类 &ndash;&gt;
     <bean name="phoneServiceImpl" class="com.dream.service.impl.PhoneServiceImpl">
         <property name="mobile" ref="mobile"></property>
     </bean>
-    <!-- 配置服务类 -->
+    &lt;!&ndash; 配置服务类 &ndash;&gt;
     <bean name="ipServiceImpl" class="com.dream.service.impl.IpServiceImpl">
         <property name="ipAddress" ref="ipAddress"></property>
     </bean>
-    <!-- 配置手机查询公网客户端 -->
+    &lt;!&ndash; 配置手机查询公网客户端 &ndash;&gt;
     <jaxws:client id="mobile"
                   address="http://ws.webxml.com.cn/WebServices/MobileCodeWS.asmx"
                   serviceClass="com.dream.utils.mobile.MobileCodeWSSoap">
     </jaxws:client>
-    <!-- 配置ip查询客户端 -->
+    &lt;!&ndash; 配置ip查询客户端 &ndash;&gt;
     <jaxws:client id="ipAddress"
                   address="http://ws.webxml.com.cn/WebServices/IpAddressSearchWebService.asmx"
                   serviceClass="com.dream.utils.ip.IpAddressSearchWebServiceSoap">
-    </jaxws:client>
+    </jaxws:client>-->
     <!--
 1. 配置 SecurityManager!
 -->
@@ -213,7 +213,7 @@
                 /user/shirologin = anon
                 /media/**=anon
                 /user/loginOut = logout
-                # everything else requires authentication:
+                <!--# everything else requires authentication:-->
                 /** = authc
             </value>
         </property>

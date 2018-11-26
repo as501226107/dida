@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/util")
 @Controller
 public class UtilController {
-    @Autowired
+    //@Autowired
     PhoneService ps;
     @RequestMapping("/getLocation")
     public String phone(String phone, Model model){

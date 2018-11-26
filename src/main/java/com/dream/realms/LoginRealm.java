@@ -23,6 +23,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +37,7 @@ import java.util.Set;
  *  @email  a501226107@qq.com
  *  @version 1.0
  */
+@Component
 public class LoginRealm extends AuthorizingRealm {
 	@Autowired
 	UserService us;
@@ -51,8 +53,6 @@ public class LoginRealm extends AuthorizingRealm {
 		//2.从user中获取user
 		String username = user.getUsername();
 		String password=new String(user.getPassword());
-
-
 		//3.调用数据库的方法，从数据库中查询username对应的用户记录
 		//User del = us.selectOne(new EntityWrapper<User>().eq("username",username).eq("del", 0));
 		User temp=new User();
@@ -105,15 +105,8 @@ public class LoginRealm extends AuthorizingRealm {
 	}
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		//1.获取用户的登录信息
-		User user = (User)principals.getPrimaryPrincipal();
-		List<Role> roles = user.getRoles();
-		Set<String> rs=new HashSet<>();
-		//获取当前用户的角色
-		for (Role role : roles) {
-			rs.add(role.getName());
-		}
-		SimpleAuthorizationInfo info=new SimpleAuthorizationInfo(rs);
+		//1.获取用户权限
+		SimpleAuthorizationInfo info=new SimpleAuthorizationInfo();
 		return info;
 	}
 }

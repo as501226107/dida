@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 @Service
 public class IpServiceImpl implements IpService {
-    @Autowired
+    //@Autowired
     IpAddressSearchWebServiceSoap ipAddress;
     @Override
     public String getIpAddress(String ip) {

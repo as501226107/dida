@@ -36,7 +36,6 @@ public class Apply implements Serializable {
     private String startdate;
 
     private String enddate;
-
     private Integer days;
     private String type;
     private Integer excuteId;

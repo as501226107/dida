@@ -291,10 +291,11 @@
         //为隐藏id赋值
         $("#update2_id").val(id);
         layui.use('table', function() {
+            form=layui.form;
             //初始化参数
             $.ajax({
                 url:"${pageContext.request.contextPath}/menu/getSecondMenus/"+id,
-                type:"post",
+                type:"get",
                 success:function(result) {
                     $("#pid_level2").empty();
                     var arr = result.menus;
@@ -306,6 +307,7 @@
                         } else {
                             $("#pid_level2").append("<option value='" + arr[i].id + "'>" + arr[i].name + "</option>");
                         }
+                        form.render();
                     }
                     $("#name_level2").val(data.name);
                     $("#icon_level2").val(data.icon);
@@ -314,12 +316,11 @@
                     $("#dvl1").css("display", "block");
                 }
             });
-            form=layui.form;
             form.on('select(level)', function (data) {
                 //初始化
                 update_level2_setpid(data.value);//绑定事件
             });
-            form.render();
+
             layer.open({
                 area: ['500px', '380px'],
                 title: '二级菜单更新',

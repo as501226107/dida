@@ -16,6 +16,7 @@ import org.activiti.engine.task.TaskQuery;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -74,7 +75,7 @@ public class UserController {
         }
     }
     @RequestMapping("/shirologin")
-    public String login1(String loginAddress,User user, HttpServletRequest request, HttpServletResponse response, HttpSession session){
+    public String login1(String loginAddress,User user, HttpServletRequest request, HttpServletResponse response){
         //获取当前认证的用户
         Subject subject =SecurityUtils.getSubject();
         //判断当前用户是否认证
@@ -88,6 +89,7 @@ public class UserController {
                 //开始登录
                 subject.login(token);
                 User login = (User)subject.getPrincipal();
+                Session session = subject.getSession();
                 session.setAttribute("user",login);
                 //获取待办事项
                 TaskQuery taskQuery = pe.getTaskService().createTaskQuery();//创建任务查询
@@ -119,8 +121,9 @@ public class UserController {
         return "redirect:/index.jsp";
     }
     @RequestMapping("/loginOut")
-    public String loginOut(HttpSession session) throws Exception{
-        session.invalidate();
+    public String loginOut() throws Exception{
+        Subject subject = SecurityUtils.getSubject();
+        subject.logout();
         return "redirect:/login.jsp";
     }
     @RequestMapping("/upload")

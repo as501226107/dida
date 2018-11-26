@@ -110,8 +110,5 @@ public class Test2 {
             System.out.println("===========================");
         }
     }
-    @Test
-    public void test3(){
-        System.out.println( PasswordUtils.getMD5("MD5","123","你好",1024));
-    }
+
 }
