@@ -194,7 +194,7 @@
         <property name="securityManager" ref="securityManager"/>
         <property name="loginUrl" value="/login.jsp"/>
         <property name="successUrl" value="/index.jsp"/>
-        <property name="unauthorizedUrl" value="/login.jsp"/>
+        <property name="unauthorizedUrl" value="/refuse.jsp"/>
 
         <!--<property name="filterChainDefinitionMap" ref="filterChainDefinitionMap"></property>-->
 
@@ -213,6 +213,51 @@
                 /user/shirologin = anon
                 /media/**=anon
                 /user/loginOut = logout
+                <!--配置权限-->
+                <!--&lt;!&ndash;学生权限&ndash;&gt;-->
+                <!--/student/list/1 = perms[student:query]-->
+                <!--/student/add=perms[student:add]-->
+                <!--/student/update=perms[student:update]-->
+                <!--/student/delete=perms[student:delete]-->
+                <!--/student/exportExcel =	perms[student:exportExcel]-->
+                <!--/student/importExcel =	perms[student:importExcel]-->
+                <!--&lt;!&ndash;用户权限&ndash;&gt;-->
+                <!--/userRole/add =	perms[user:create]-->
+                <!--/userRole/update =	perms[user:update]-->
+                <!--/userRole/delete =	perms[user:delete]-->
+                <!--/userRole/list/1 =	perms[user:query]-->
+                <!--/userRole/changeStatus = perms[user:changeStatus]-->
+                <!--&lt;!&ndash;角色权限&ndash;&gt;-->
+                <!--/role/add =	perms[role:add]-->
+                <!--/role/delete=	perms[role:delete]-->
+                <!--/role/list/1    =	perms[role:query]-->
+                <!--/role/update    =	perms[role:update]-->
+                <!--&lt;!&ndash;菜单权限&ndash;&gt;-->
+                <!--/menu/list/1 =	perms[menu:query]-->
+                <!--/menu/add =	perms[menu:add]-->
+                <!--/menu/delete =	perms[menu:delete]-->
+                <!--/menu/update =	perms[menu:update]-->
+                <!--&lt;!&ndash;员工权限&ndash;&gt;-->
+                <!--/emp/add =	perms[emp:add]-->
+                <!--/emp/delete =	perms[emp:delete]-->
+                <!--/emp/update =	perms[emp:update]-->
+                <!--/emp/list/1 =	perms[emp:query]-->
+                <!--&lt;!&ndash;学科权限&ndash;&gt;-->
+                <!--/course/add	= perms[course:add]-->
+                <!--/course/delete	=perms[course:delete]-->
+                <!--/course/update	=perms[course:update]-->
+                <!--/course/list/1	=perms[course:query]-->
+                <!--&lt;!&ndash;班级权限&ndash;&gt;-->
+                <!--/grade/add =	perms[grade:add]-->
+                <!--/grade/delete =	perms[grade:delete]-->
+                <!--/grade/update =	perms[grade:update]-->
+                <!--/greade/list/1 =perms[grade:query]-->
+                <!--&lt;!&ndash;activiti权限&ndash;&gt;-->
+                <!--/process/deploy =	perms[process:deploy]-->
+                <!--/process/list =perms[process:list]-->
+                <!--/process/processpng	=perms[process:processpng]-->
+                <!--/process/delete =	perms[process:delete]-->
+                <!--/process/approve =	perms[process:approve]-->
                 <!--# everything else requires authentication:-->
                 /** = authc
             </value>

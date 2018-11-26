@@ -34,5 +34,16 @@
             and p.type='menu'
     )	 ORDER BY id
     </select>
-
+    <select id="getPermissions" resultMap="BaseResultMap">
+    select * from sys_permission where id in(
+         select DISTINCT p.id from sys_user u,sys_user_role rs,sys_role r,sys_role_permission rp,sys_permission p
+            where u.id=rs.sys_user_id
+            and rs.sys_role_id=r.id
+            and r.id=rp.sys_role_id
+            and rp.sys_permission_id =p.id
+            and p.del=0
+            and u.id=#{id}
+            and p.type='permission'
+    )	 ORDER BY id
+    </select>
 </mapper>

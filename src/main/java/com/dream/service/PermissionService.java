@@ -15,4 +15,5 @@ import java.util.List;
  */
 public interface PermissionService extends IService<Permission> {
     public List<Permission> getMenus(Integer id);
+    public List<Permission> getPermissions(Integer id);
 }

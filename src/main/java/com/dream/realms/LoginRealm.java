@@ -4,10 +4,14 @@
 package com.dream.realms;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.dream.bean.Permission;
 import com.dream.bean.Role;
 import com.dream.bean.User;
+import com.dream.service.PermissionService;
+import com.dream.service.ProcessService;
 import com.dream.service.RoleService;
 import com.dream.service.UserService;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -20,11 +24,13 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +49,8 @@ public class LoginRealm extends AuthorizingRealm {
 	UserService us;
 	@Autowired
 	RoleService rs;
+	@Autowired
+	PermissionService ps;
 	/* (non-Javadoc)
 	 * @see org.apache.shiro.realm.AuthenticatingRealm#doGetAuthenticationInfo(org.apache.shiro.authc.AuthenticationToken)
 	 */
@@ -107,6 +115,16 @@ public class LoginRealm extends AuthorizingRealm {
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 		//1.获取用户权限
 		SimpleAuthorizationInfo info=new SimpleAuthorizationInfo();
+		//2.获取session
+		Session session = SecurityUtils.getSubject().getSession();
+		User user=(User)session.getAttribute("user");
+		List<Permission> permissions = ps.getPermissions(user.getId());
+		ArrayList<String> a =new ArrayList<>();
+		for (Permission s : permissions) {
+			a.add(s.getPercode());
+		}
+		//3.设置权限
+		info.addStringPermissions(a);
 		return info;
 	}
 }

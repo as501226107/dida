@@ -27,4 +27,9 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     public List<Permission> getMenus(Integer id) {
         return pm.getMenus(id);
     }
+
+    @Override
+    public List<Permission> getPermissions(Integer id) {
+        return pm.getPermissions(id);
+    }
 }

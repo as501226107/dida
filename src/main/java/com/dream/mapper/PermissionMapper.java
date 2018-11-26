@@ -15,4 +15,5 @@ import java.util.List;
  */
 public interface PermissionMapper extends BaseMapper<Permission> {
     public List<Permission> getMenus(Integer id);
+    public List<Permission> getPermissions(Integer id);
 }
