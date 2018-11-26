@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <%--
   Created by IntelliJ IDEA.
   User: Administrator
@@ -78,7 +79,9 @@
             <div class="layui-col-xs2">
                 <div class="layui-form-item">
                     <div class="layui-input-block">
-                        <button class="layui-btn" onclick="searchData()"><i class="layui-icon layui-icon-search">搜索</i></button>
+                        <shiro:hasPermission name="user:query">
+                            <button class="layui-btn" onclick="searchData()"><i class="layui-icon layui-icon-search">搜索</i></button>
+                        </shiro:hasPermission>
                     </div>
                 </div>
             </div>
@@ -111,10 +114,17 @@
                     </c:forEach>
                 </td>
                 <td><span style="${u.locked=='0'?'color: #1E9FFF':'color:red'}"  id="span_${u.id}">${u.locked=='0'?'启用':'禁用'}</span></td>
-                <td><a class="layui-btn    layui-btn-mini" href="#" onclick="showRoles(${u.id});">编辑</a>
+                <td>
+                    <shiro:hasPermission name="user:update">
+                        <a class="layui-btn    layui-btn-mini" href="#" onclick="showRoles(${u.id});">编辑</a>
+                    </shiro:hasPermission>
+                    <shiro:hasPermission name="user:changeStatus">
                     <a class="layui-btn  ${u.locked=='0'?'layui-btn-danger':''}  layui-btn-mini" name="${u.locked}" onclick="changeState(this,${u.id});"  lay-event="detail">${u.locked=='0'?'禁用':'启用'}</a>
+                    </shiro:hasPermission>
+                    <shiro:hasPermission name="user:delete">
                     <a class="layui-btn  layui-btn-mini"
                        lay-event="del" onclick="deleteCourse(${u.id});">删除</a>
+                    </shiro:hasPermission>
                 </td>
             </tr>
         </c:forEach>

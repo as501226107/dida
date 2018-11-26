@@ -289,11 +289,6 @@
       <artifactId>ehcache</artifactId>
       <version>3.4.0</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-ehcache</artifactId>
-      <version>1.4.0</version>
-    </dependency>
     <!-- shiro -->
     <dependency>
       <groupId>org.apache.shiro</groupId>
@@ -335,6 +330,17 @@
       <groupId>org.activiti</groupId>
       <artifactId>activiti-spring-boot-starter-jpa</artifactId>
       <version>5.22.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-ehcache</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+    <!--二维码模块-->
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>core</artifactId>
+      <version>3.3.0</version>
     </dependency>
   </dependencies>
 

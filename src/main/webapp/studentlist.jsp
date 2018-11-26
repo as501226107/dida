@@ -7,6 +7,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -52,44 +53,50 @@
     </script>
 </head>
 <body>
-<form id="studentForm" action="${pageContext.request.contextPath}/student/list/1" method="post">
-    <div class="layui-container">
-        <div class="layui-row" style="margin-top: 10px">
-            <div class="layui-col-xs3" style="margin-right: 20px">
-                <div class="layui-form-item layui-form-text">
-                    <label class="layui-form-label">姓名：</label>
-                    <div class="layui-input-block">
-                        <input type="text" name="name" value="${pageBean.bean.name}" id="no" class="layui-input" placeholder="学生姓名">
+<shiro:hasPermission name="student:query">
+    <form id="studentForm" action="${pageContext.request.contextPath}/student/list/1" method="post">
+        <div class="layui-container">
+            <div class="layui-row" style="margin-top: 10px">
+                <div class="layui-col-xs3" style="margin-right: 20px">
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">姓名：</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" value="${pageBean.bean.name}" id="no" class="layui-input" placeholder="学生姓名">
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="layui-col-xs3" style="margin-right: 20px">
-                <div class="layui-form-item layui-form-text">
-                    <label class="layui-form-label">班级：</label>
-                    <div class="layui-input-block">
-                        <select id="cds" name="gid" class="layui-input" id="fg">
-                            <option value="">--请输入班级--</option>
-                        </select>
+                <div class="layui-col-xs3" style="margin-right: 20px">
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">班级：</label>
+                        <div class="layui-input-block">
+                            <select id="cds" name="gid" class="layui-input" id="fg">
+                                <option value="">--请输入班级--</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="layui-col-xs2">
-                <div class="layui-form-item">
-                    <div class="layui-input-block">
-                        <button class="layui-btn" type="submit" onclick="search()"><i class="layui-icon layui-icon-search">搜索</i></button>
+                <div class="layui-col-xs2">
+                    <div class="layui-form-item">
+
+                            <div class="layui-input-block">
+                                <button class="layui-btn" type="submit" onclick="search()"><i class="layui-icon layui-icon-search">搜索</i></button>
+                            </div>
+
                     </div>
                 </div>
-            </div>
-            <div class="layui-col-xs2">
-                <div class="layui-form-item">
-                    <div class="layui-input-block">
-                        <a class="layui-btn layui-btn-mini layui-btn-mini" href="javascript:exportExcel();" lay-event="detail">导出Excel</a>
+                <div class="layui-col-xs2">
+                    <div class="layui-form-item">
+                        <shiro:hasPermission name="student:exportExcel">
+                            <div class="layui-input-block">
+                                <a class="layui-btn layui-btn-mini layui-btn-mini" href="javascript:exportExcel();" lay-event="detail">导出Excel</a>
+                            </div>
+                        </shiro:hasPermission>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 </form>
+</shiro:hasPermission>
 <div class="layui-container">
     <table class="layui-table" id="tbdata" lay-filter="tbop">
         <thead>
@@ -112,10 +119,15 @@
                     <td>${s.sex}</td>
                     <td>${s.phone}</td>
                     <td>${s.email}</td>
-                    <td><a class="layui-btn layui-btn-mini" href="${pageContext.request.contextPath}/student/pageToUpdate/${s.id}">编辑</a>
-                        <a class="layui-btn layui-btn-mini layui-btn-mini" href="${pageContext.request.contextPath}/student/pageToDeatail/${s.id}" lay-event="detail">查看详情</a>
-                        <a class="layui-btn layui-btn-danger layui-btn-mini"
-                           lay-event="del" onclick="deleteCourse(${s.id});">删除</a>
+                    <td>
+                        <shiro:hasPermission name="student:update">
+                          <a class="layui-btn layui-btn-mini" href="${pageContext.request.contextPath}/student/pageToUpdate/${s.id}">编辑</a>
+                        </shiro:hasPermission>
+                            <a class="layui-btn layui-btn-mini layui-btn-mini" href="${pageContext.request.contextPath}/student/pageToDeatail/${s.id}" lay-event="detail">查看详情</a>
+                        <shiro:hasPermission name="student:delete">
+                            <a class="layui-btn layui-btn-danger layui-btn-mini"
+                               lay-event="del" onclick="deleteCourse(${s.id});">删除</a>
+                        </shiro:hasPermission>
                     </td>
                 </tr>
             </c:forEach>

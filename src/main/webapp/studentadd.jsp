@@ -1,3 +1,4 @@
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <%--
   Created by IntelliJ IDEA.
   User: Administrator
@@ -105,10 +106,12 @@
                        class="layui-input">
             </div>
         </div>
-        <div class="layui-form-item">
-            <input class="layui-btn"  style="margin-left: 10%" id="btn1" type="submit"
-                   value="确认新增">
-        </div>
+        <shiro:hasPermission name="student:add">
+            <div class="layui-form-item">
+                <input class="layui-btn"  style="margin-left: 10%" id="btn1" type="submit"
+                       value="确认新增">
+            </div>
+        </shiro:hasPermission>
     </form>
 </div>
 

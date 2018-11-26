@@ -7,6 +7,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <html>
 <head>
     <meta charset="utf-8">
@@ -72,9 +73,16 @@
                 <td>${c.week}</td>
                 <td>${c.createdate}</td>
                 <td>${c.type}</td>
-                <td><a class="layui-btn layui-btn-mini" href="${pageContext.request.contextPath}/course/pageToUpdate/${c.id}">编辑</a>
+                <td>
+                    <shiro:hasPermission name="course:update">
+                        <a class="layui-btn layui-btn-mini" href="${pageContext.request.contextPath}/course/pageToUpdate/${c.id}">编辑</a>
+
+                    </shiro:hasPermission>
+                    <shiro:hasPermission name="course:delete">
                     <a class="layui-btn layui-btn-danger layui-btn-mini"
-                       lay-event="del" onclick="deleteCourse(${c.id});">删除</a></td>
+                       lay-event="del" onclick="deleteCourse(${c.id});">删除</a>
+                    </shiro:hasPermission>
+                </td>
             </tr>
         </c:forEach>
 

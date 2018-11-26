@@ -1,3 +1,4 @@
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <%--
   Created by IntelliJ IDEA.
   User: Administrator
@@ -85,9 +86,11 @@
                 <img alt="个人一寸照片" src="${pageContext.request.contextPath}/img/${emp.photo}"  id="img1" width="200px" height="300px">
             </div>
         </div>
-        <div class="layui-form-item">
-            <input class="layui-btn"  style="margin-left: 10%"  id="btn1"  type="submit" value="确认更新">
-        </div>
+        <shiro:hasPermission name="emp:update">
+            <div class="layui-form-item">
+                 <input class="layui-btn"  style="margin-left: 10%"  id="btn1"  type="submit" value="确认更新">
+            </div>
+        </shiro:hasPermission>
     </form>
 </div>
 

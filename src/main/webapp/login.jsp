@@ -22,34 +22,55 @@
 <link rel="stylesheet" type="text/css"
 	href="${pageContext.request.contextPath}/media/css/verify.css">
 <script type="text/javascript"
-	src="${pageContext.request.contextPath}/media/js/jquery.min.js"></script>
+	src="${pageContext.request.contextPath}/media/js/jquery-1.11.0.js"></script>
 
 </head>
 <body class="layui-bg-black">
-	<div class="layui-canvs"></div>
+	<div class="layui-canvs">
+
+	</div>
+
 	<div class="layui-layout layui-layout-login">
-		<form action="${pageContext.request.contextPath}/user/shirologin"
-			method="post">
-			<input id="loginAddress" name="loginAddress" type="hidden"/>
-			<h1>
-				<strong>滴答办公系统登录</strong> <em>Tick-tock Office System</em>
-			</h1>
-			<div class="layui-user-icon larry-login">
-				<input type="text" placeholder="账号" class="login_txtbx"
-					name="username" value="admin" />
+		<div class="layui-tab">
+			<ul class="layui-tab-title">
+				<li class="layui-this">普通登录</li>
+				<li>二维码登录</li>
+			</ul>
+			<div class="layui-tab-content">
+				<div class="layui-tab-item layui-show">
+					<form action="${pageContext.request.contextPath}/user/login"
+						  method="post">
+						<input id="loginAddress" name="loginAddress" type="hidden"/>
+						<h1>
+							<strong>滴答办公系统登录</strong> <em>Tick-tock Office System</em>
+
+						</h1>
+
+						<div class="layui-user-icon larry-login">
+							<input type="text" placeholder="账号" class="login_txtbx"
+								   name="username" value="admin" />
+						</div>
+						<div class="layui-pwd-icon larry-login">
+							<input type="password" placeholder="密码" name="password"
+								   value="123" class="login_txtbx" />
+						</div>
+						<div class="feri-code">
+							<div id="mpanel4"></div>
+						</div>
+						<div class="layui-submit larry-login">
+							<input type="submit" id="btn1" disabled="disabled" value="立即登陆"
+								   class="submit_btn" />
+						</div>
+					</form>
+				</div>
+				<div class="layui-tab-item">
+					<img src="${pageContext.request.contextPath}/xcode/getCode" style="width: 200px;height: 200px"/>
+				</div>
+
 			</div>
-			<div class="layui-pwd-icon larry-login">
-				<input type="password" placeholder="密码" name="password"
-					value="123" class="login_txtbx" />
-			</div>
-			<div class="feri-code">
-				<div id="mpanel4"></div>
-			</div>
-			<div class="layui-submit larry-login">
-				<input type="submit" id="btn1" disabled="disabled" value="立即登陆"
-					class="submit_btn" />
-			</div>
-		</form>
+		</div>
+
+
 		<div class="layui-login-text">
 			<p>© 2016-2018 北京滴答科技有限公司 Feri 版权所有</p>
 		</div>
@@ -58,8 +79,29 @@
 		src="${pageContext.request.contextPath}/media/js/login.js"></script>
 	<script type="application/javascript"
 		src="${pageContext.request.contextPath}/media/js/verify.min.js"></script>
+	<script  type="text/javascript"
+			 src="${pageContext.request.contextPath}/media/layui/layui.js" charset="utf-8"></script>
 	<script type="text/javascript">
 		$(function() {
+            function validateLogin(){
+                var address=$("#loginAddress").val();
+                $.ajax({
+                    type: "POST",
+                    url: "${pageContext.request.contextPath}/xcode/longConnection",
+                    data: "uuid=${sessionScope.uuid}&loginAddress="+address,
+                    success: function(data){
+
+                        if(data == "wait"){
+                            console.log("wait..");
+                            window.setTimeout(validateLogin, "3000");
+                        }else if(data=="success"){
+                            console.log("success");
+                            location.href="${pageContext.request.contextPath}/index.jsp";
+                        }
+                    }
+                });
+            }
+            validateLogin();
 			//滑动验证码
 			$('#mpanel4').pointsVerify({
 				defaultNum : 1, //默认的文字数量
@@ -67,11 +109,11 @@
 				vSpace : 5, //间隔
 				imgName : [ '1.jpg', '2.jpg', '3.jpg' ],
 				imgSize : {
-					width : '400px',
+					width : '380px',
 					height : '200px',
 				},
 				barSize : {
-					width : '400px',
+					width : '380px',
 					height : '40px',
 				},
 				ready : function() {
@@ -96,6 +138,49 @@
                 }
             });
 		});
+	</script>
+	<script>
+        layui.use('element', function(){
+            var $ = layui.jquery
+                ,element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
+
+            //触发事件
+            var active = {
+                tabAdd: function(){
+                    //新增一个Tab项
+                    element.tabAdd('demo', {
+                        title: '新选项'+ (Math.random()*1000|0) //用于演示
+                        ,content: '内容'+ (Math.random()*1000|0)
+                        ,id: new Date().getTime() //实际使用一般是规定好的id，这里以时间戳模拟下
+                    })
+                }
+                ,tabDelete: function(othis){
+                    //删除指定Tab项
+                    element.tabDelete('demo', '44'); //删除：“商品管理”
+
+
+                    othis.addClass('layui-btn-disabled');
+                }
+                ,tabChange: function(){
+                    //切换到指定Tab项
+                    element.tabChange('demo', '22'); //切换到：用户管理
+                }
+            };
+
+            $('.site-demo-active').on('click', function(){
+                var othis = $(this), type = othis.data('type');
+                active[type] ? active[type].call(this, othis) : '';
+            });
+
+            //Hash地址的定位
+            var layid = location.hash.replace(/^#test=/, '');
+            element.tabChange('test', layid);
+
+            element.on('tab(test)', function(elem){
+                location.hash = 'test='+ $(this).attr('lay-id');
+            });
+
+        });
 	</script>
 </body>
 </html>

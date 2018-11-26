@@ -23,21 +23,19 @@
   </style>
 </head>
 
-<body>
+<body class="layui-layout-body">
 <div class="layui-layout layui-layout-admin kit-layout-admin">
   <div class="layui-header">
     <div class="layui-logo">
       <img src="${pageContext.request.contextPath}/media/images/qf_logo.png" style="margin-right: 10px" /><span
             style="font-size: 22px">滴答办公系统</span>
     </div>
-
     <!-- 头部区域（可配合layui已有的水平导航） -->
     <ul class="layui-nav layui-layout-left">
       <li class="layui-nav-item kit-side-fold" lay-unselect >
         <a href="javascript:flexible();" title="侧边伸缩">
           <i class="layui-icon layui-icon-shrink-right" id="LAY_flexible"></i>
         </a>
-
       </li>
       <li class="layui-nav-item" lay-unselect>
         <a href="${pageContext.request.contextPath}/index.jsp" layadmin-event="refresh" title="刷新">
@@ -66,7 +64,6 @@
       <li class="layui-nav-item"><a href="${pageContext.request.contextPath}/user/loginOut">注销</a></li>
     </ul>
   </div>
-
   <div class="layui-side layui-bg-black ">
     <div class="layui-side-scroll">
       <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
@@ -137,7 +134,6 @@
               <dd><a href="javascript:;" id="2" onclick="showTab(3,'${pageContext.request.contextPath}/student/pageToImport','学生导入')">&nbsp;&nbsp;&nbsp;&nbsp;学生导入</a></dd>
           </dl>
         </li>--%>
-
       </ul>
     </div>
   </div>
@@ -145,7 +141,7 @@
     <!-- 内容主体区域 -->
     <div class="layui-tab" lay-filter="demo" style="width: 100%;height: 90%">
       <ul class="layui-tab-title"></ul>
-      <div class="layui-tab-content" style="width: 99%;height: 98%"></div>
+      <div class="layui-tab-content" style="width: 100%;height: 100%"></div>
     </div>
   </div>
 
@@ -184,6 +180,13 @@
         tid=id;
     }
 
+</script>
+<script>
+    //JavaScript代码区域
+    layui.use('element', function(){
+        var element = layui.element;
+
+    });
 </script>
 </body>
 

@@ -7,6 +7,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <!DOCTYPE html>
 <html>
 
@@ -83,13 +84,20 @@
                         ${p.parentid==0?'一级菜单':'二级菜单'}
                 </td>
                 <td>
-                    <c:if test="${p.parentid==0}">
-                        <a class="layui-btn layui-btn-mini" href="javascript:updateMenu1(${p.id});">编辑</a>
-                    </c:if>
-                    <c:if test="${p.parentid!=0}">
-                        <a class="layui-btn layui-btn-mini" href="javascript:updateMenu2(${p.id});">编辑</a>
-                    </c:if>
-                    <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del" onclick="deleteMenus(${p.id});">删除</a>
+
+                        <c:if test="${p.parentid==0}">
+                            <shiro:hasPermission name="menu:update">
+                                 <a class="layui-btn layui-btn-mini" href="javascript:updateMenu1(${p.id});">编辑</a>
+                            </shiro:hasPermission>
+                         </c:if>
+                        <c:if test="${p.parentid!=0}">
+                            <shiro:hasPermission name="menu:update">
+                                <a class="layui-btn layui-btn-mini" href="javascript:updateMenu2(${p.id});">编辑</a>
+                            </shiro:hasPermission>
+                        </c:if>
+                    <shiro:hasPermission name="menu:delete">
+                     <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del" onclick="deleteMenus(${p.id});">删除</a>
+                    </shiro:hasPermission>
                 </td>
             </tr>
         </c:forEach>

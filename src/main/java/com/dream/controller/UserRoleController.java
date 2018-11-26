@@ -9,8 +9,6 @@ import com.dream.service.RoleService;
 import com.dream.service.UserRoleService;
 import com.dream.service.UserService;
 import com.dream.utils.PageHelper;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;

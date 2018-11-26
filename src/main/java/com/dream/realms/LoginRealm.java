@@ -123,6 +123,7 @@ public class LoginRealm extends AuthorizingRealm {
 		for (Permission s : permissions) {
 			a.add(s.getPercode());
 		}
+		System.out.println("权限："+a);
 		//3.设置权限
 		info.addStringPermissions(a);
 		return info;

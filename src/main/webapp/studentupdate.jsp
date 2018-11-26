@@ -7,6 +7,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -114,10 +115,12 @@
                        class="layui-input">
             </div>
         </div>
-        <div class="layui-form-item">
-            <input class="layui-btn"  style="margin-left: 10%" id="btn1" type="submit"
-                   value="确认更新">
-        </div>
+        <shiro:hasPermission name="student:update">
+            <div class="layui-form-item">
+                <input class="layui-btn"  style="margin-left: 10%" id="btn1" type="submit"
+                       value="确认更新">
+            </div>
+        </shiro:hasPermission>
     </form>
 </div>
 

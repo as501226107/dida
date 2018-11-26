@@ -51,25 +51,40 @@ public class UserController {
     @Autowired
     ProcessEngine pe;
     @RequestMapping("/login")
-    public void login(User user, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception{
-        User login = userService.selectOne(new EntityWrapper<User>(user).eq("del",0));
-        if(login!=null) {
-            session.setAttribute("user",login);
+    public void login(String loginAddress,User user, HttpServletRequest request, HttpServletResponse response) throws Exception{
+        User u = userService.selectOne(new EntityWrapper<User>(user).eq("del",0));
+        if(u!=null) {
+            //获取当前认证的用户
+            Subject subject =SecurityUtils.getSubject();
+            //将用户名和密码封装为UsernamePasswordToken对象
+            UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
+            //设置shiro登录认证
+            subject.login(token);
+            Session session = subject.getSession();
+            session.setAttribute("user",u);
+            //获取待办事项
+            TaskQuery taskQuery = pe.getTaskService().createTaskQuery();//创建任务查询
+            taskQuery.taskAssignee(u.getUname());//设置查询的名字
+            Integer size=taskQuery.list().size();//
+            session.setAttribute("myTasks",size);
             String loginTime= TimeUtils.getTime();
             //更新上次登录时间
-            userService.updateForSet("last_login_date='"+loginTime+"'",new EntityWrapper<User>().eq("id",login.getId()));
+            userService.updateForSet("last_login_date='"+loginTime+"'",new EntityWrapper<User>().eq("id",u.getId()));
             //获取用户登录信息
             String localAddr = request.getRemoteAddr();
-            String location = ipService.getIpAddress(localAddr);
-            Loginlog log=new Loginlog(localAddr,user.getUsername(),loginTime,location);
+            //获取菜单
+            List<Permission> menus = ps.getMenus(u.getId());
+            Loginlog log=new Loginlog(localAddr,user.getUsername(),loginTime,loginAddress);
             //存入用户登录信息
             ls.insert(log);
             //读取最近四条用户登录信息
             Page<Loginlog> page=new Page<>(1,4,"createtime",false);
-            Page<Loginlog> pages = ls.selectPage(page, new EntityWrapper<Loginlog>().eq("no", login.getUsername()));
+            Page<Loginlog> pages = ls.selectPage(page, new EntityWrapper<Loginlog>().eq("no", u.getUsername()));
             List<Loginlog> loginLog = pages.getRecords();
             session.setAttribute("loginLog",loginLog);
-            response.getWriter().write("<script>location.href='"+request.getContextPath()+"/index.jsp'</script>");;
+            session.setAttribute("menus",menus);
+            response.getWriter().write("<script>location.href='"+request.getContextPath()+"/index.jsp'</script>");
+
         }else {
             response.getWriter().write("<script>alert('用户名或者密码错误');location.href='"+request.getContextPath()+"/login.jsp'</script>");
         }

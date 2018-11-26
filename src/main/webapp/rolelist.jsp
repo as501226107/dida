@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <%--
   Created by IntelliJ IDEA.
   User: Administrator
@@ -54,9 +55,11 @@
 <body>
 <div class="layui-container">
     <div class="layui-btn-group">
-        <button class="layui-btn layui-btn-norma" onclick="addRole()">
-            <i class="layui-icon">&#xe654;</i>添加角色
-        </button>
+        <shiro:hasPermission name="role:add">
+            <button class="layui-btn layui-btn-norma" onclick="addRole()">
+                <i class="layui-icon">&#xe654;</i>添加角色
+            </button>
+        </shiro:hasPermission>
     </div>
 </div>
 <div class="layui-container">
@@ -77,9 +80,13 @@
                 <td>${r.name}</td>
                 <td>${r.remark}</td>
                 <td>
-                    <a class="layui-btn layui-btn-mini" href="#" onclick="updateRole(${r.id});">编辑</a>
-                    <a class="layui-btn layui-btn-danger layui-btn-mini"
+                    <shiro:hasPermission name="role:update">
+                     <a class="layui-btn layui-btn-mini" href="#" onclick="updateRole(${r.id});">编辑</a>
+                    </shiro:hasPermission>
+                    <shiro:hasPermission name="role:delete">
+                     <a class="layui-btn layui-btn-danger layui-btn-mini"
                        lay-event="del" onclick="deleteCourse(${r.id});">删除</a>
+                    </shiro:hasPermission>
                 </td>
             </tr>
         </c:forEach>

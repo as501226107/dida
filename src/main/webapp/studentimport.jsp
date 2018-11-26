@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core"  prefix="c"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,7 +11,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, maximum-scale=1">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/media/layui/css/layui.css" ${pageContext.request.contextPath}/media="all">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/media/layui/css/layui.css" media="all">
 <script src="${pageContext.request.contextPath}/media/js/jquery.min.js"></script>
 </head>
 <body>
@@ -41,9 +42,11 @@
 					<input type="file" name="mFile" id="no1" class="layui-input">
 				</div>
 			</div>
-		    <div class="layui-form-item">
-				<input class="layui-btn" style="margin-left: 10%"  id="btn1" type="submit" value="确认导入">
-			</div>
+			<shiro:hasPermission name="student:importExcel">
+				<div class="layui-form-item">
+					<input class="layui-btn" style="margin-left: 10%"  id="btn1" type="submit" value="确认导入">
+				</div>
+			</shiro:hasPermission>
 		</form>
 	</div>
 	<script src="${pageContext.request.contextPath}/media/layui/layui.js"></script>
